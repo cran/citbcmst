@@ -1,0 +1,188 @@
+\documentclass[11pt]{article}
+
+\usepackage{graphics}
+\usepackage{amsmath}
+\usepackage{indentfirst}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{verbose,letterpaper,tmargin=20mm,bmargin=20mm,lmargin=3cm,rmargin=3cm}
+\SweaveOpts{echo=TRUE}
+\setlength{\parindent}{0pt}
+
+% \VignetteIndexEntry{citbcmst}
+
+\begin{document}
+<<foo,include=FALSE,echo=FALSE>>=
+foo <- packageDescription("citbcmst")
+@
+% \options(keep.source = TRUE, width = 90)
+
+\title{\bf citbcmst : a package to assign CIT Breast Cancer Molecular SubTypes from expression data}
+\author{<CITR@ligue-cancer.net>}
+
+\maketitle
+
+\begin{center}
+ \textit{Cartes d'Identit\'e des Tumeurs} research program - Ligue Nationale Contre le Cancer, Paris, France
+\\(http://cit.ligue-cancer.net)
+\end{center}
+
+% SECTION Overview
+\section*{Overview}
+The existence of breast cancer molecular subtypes was shown by Perou et al (Nature 2000) using transcriptomic data.
+The work by Guedj et al \cite{guedj11} yields a new breast cancer molecular classification - called the CIT classification.
+This package permits to assign a transcriptomic profile to one of the 6 CIT breast cancer molecular subtypes with a confidence index.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+
+
+
+% SECTION subtypes prediction
+\section{CIT Subtypes Assignation Approach}
+To assign a sample to one of the 6 CIT breast cancer molecular subtypes from expression data, a centroid based approach is used.
+Centroids of the 6 CIT breast cancer molecular subtypes are defined on a subset (coreset) of 355 samples and 375 probesets (257 HUGO gene symbols).
+These data are in the object \textit{citbcmst} that can be accessed by :
+<<centroid>>=
+library(citbcmst)
+data(citbcmst)
+summary(citbcmst)
+@
+
+\textit{citbcmst} contains the following objects :
+\begin{description}
+\item[data] CIT coreset expression data matrix
+\item[data.cl] CIT breast cancer molecular subtypes of the coreset
+\item[data.annot] probesets annotations provided by NetAffx (version na30) in order to map samples from other plateforms than Affymetrix
+\end{description}
+
+
+To assign a new sample to a CIT subtype ( \textbf{\textit{cit.assignBcmst}} function) the following steps are needed:
+\begin{enumerate}
+\item{mapping the probes from the new expression dataset to the 375 discrimating probe sets used in the CIT centroids (or to the 257 corresponding HUGO gene symbols, when the microarray platform of the new dataset is not Affymetrix HG U133 plus 2.0) }
+\item{averaging expression measures per HUGO gene symbol both in the new dataset and in the CIT coreset, if step 1 is based on HUGO gene symbols. In any case, the external data and the CIT coreset data are reduced to discrimating probes/genes measured in both datasets. }
+\item{recomputing the CIT centroids of the 6 CIT subtypes using the CIT coreset data resulting from step 2 }
+\item{computing distance of the new sample(s) to those 6 centroids}
+\item{assigning each sample to the subtype corresponding to the closest centroid\\
+In some case, (1) a sample can be close to several centroids or (2) the closest centroid can be too far to confidently assign the sample to a given subtype.
+In the first case, the sample will be considered as a \textit{"mixed"} sample and in the second case as an outlier.
+In both cases, those samples may be classified as uncertain and so removed from the analysis.\\}
+\end{enumerate}
+
+Only an expression data matrix/data.frame, with ids as rownames, is required (cf section\ref{example}).\\
+
+The output of \textbf{\textit{cit.assignBcmst}} is a dataframe with n rows (n= number of samples in the new dataset) and 4 columns :
+\begin{description}
+\item[citbcmst] subtype of the closest centroid for each sample
+\item[citbcmst.mixed] subtypes of the closest centroids for each sample (for "mixed" samples)
+\item[citbcmst.core] subtype of the closes sample for "core" samples ("outlier" and  "mixed" samples are set to NA)
+\item[citbcmst.confidence] confidence annotation CORE, OUTLIER or MIXED 
+\end{description}
+The cutoffs to define mixed and outlier samples are automatically computed but can be set manually (cf help(cit.bcmst)).
+
+
+
+% SECTION EXAMPLE AFFY
+\newpage
+\section{Example on an Affymetrix dataset}
+Here is an example on the public dataset from \textit{Bertheau et al 2007}\cite{bertheau07}, using Affymetrix HG U133A platform.
+In this case, mapping to the coreset data can be done on probe sets ids as HG U133A probe sets are included in the HG U133Plus2 chip.
+
+\label{example}
+<<affy>>=
+data(exp.norm.bertheau07)
+exp.annot.bertheau07 <- data.frame(id=rownames(exp.norm.bertheau07), stringsAsFactors=F, row.names=rownames(exp.norm.bertheau07) )
+@
+
+<<label=fig1plot, fig=FALSE,echo=TRUE>>=
+citbcmst.bertheau07 <- cit.assignBcmst(   data=exp.norm.bertheau07,
+                                          data.annot=exp.annot.bertheau07,
+                                          data.colId="id",
+                                          data.colMap="id" ,
+                                          citbcmst.colMap="Probe.Set.ID",
+                                          dist.method="dlda",
+                                          plot=TRUE
+                                      )
+@
+
+<<affy2>>=
+str(citbcmst.bertheau07)
+table(citbcmst.bertheau07$citbcmst)
+table(citbcmst.bertheau07$citbcmst.mixte)
+table(citbcmst.bertheau07$citbcmst.core)
+table(citbcmst.bertheau07$citbcmst.confidence)
+@
+
+\begin{figure}
+\begin{center}
+<<label=fig1,fig=TRUE,echo=FALSE>>=
+<<fig1plot>>
+@
+\end{center}
+\caption{PCA of CIT data and Bertheau et al 2007 dataset}
+\label{fig:one}
+\end{figure}
+
+
+
+
+% SECTION EXAMPLE OTHER PLATFORM
+\newpage
+\section{Example on an non-Affymetrix dataset}
+Here is an example on the public dataset from \textit{Chanrion et al. 2008}\cite{chanrion08}, using 70-mer oligonucleotide microarrays.
+The CIT classification is optimised for Affymetrix dataset, so the results on other platforms can be less relevant. For non-Affymetrix dataset, the use of Pearson metric is recommended.
+Nethertheless on this ER+ dataset we obtained very consistent results with no basL samples and only 3 mApo which presented higher ERBB2 expression for 2 of them.
+
+This dataset was first aggregated on Gene Symbol annotations given with the data and used to map to CIT data, i.e. \verb@citbcmst.colMap@ is set to "Gene.Symbol".
+<<oligo>>=
+data(exp.norm.chanrion08)
+exp.annot.chanrion08 <- data.frame(id=rownames(exp.norm.chanrion08), gs=rownames(exp.norm.chanrion08), stringsAsFactors=F, row.names=rownames(exp.norm.chanrion08) )
+@
+<<label=fig2plot, fig=FALSE,echo=TRUE>>=
+citbcmst.chanrion08 <- cit.assignBcmst(   data=exp.norm.chanrion08,
+                                          data.annot=exp.annot.chanrion08,
+                                          data.colId="id",
+                                          data.colMap="gs" ,
+                                          citbcmst.colMap="Gene.Symbol",
+                                          dist.method="pearson",
+                                          plot=TRUE
+                                      )
+@
+<<oligo2>>=
+str(citbcmst.chanrion08)
+table(citbcmst.chanrion08$citbcmst)
+table(citbcmst.chanrion08$citbcmst.mixte)
+table(citbcmst.chanrion08$citbcmst.core)
+table(citbcmst.chanrion08$citbcmst.confidence)
+@
+
+\begin{figure}
+\begin{center}
+<<label=fig2, fig=TRUE, echo=FALSE>>=
+<<fig2plot>>
+@
+\end{center}
+\caption{PCA visualisation of CIT data and Chanrion et al 2008 dataset}
+\label{fig:two}
+\end{figure}
+
+
+\newpage
+
+{\small
+\begin{thebibliography}{99}
+\bibitem{bertheau07} Bertheau P, Turpin E, Rickman DS, Espie M, de Reynies A, Feugeas JP, et al. (2007).
+\emph{Exquisite sensitivity of TP53 mutant and basal breast cancers to a dose-dense epirubicin-cyclophosphamide regimen}.
+PLoS Med, 4: e90.
+\bibitem{chanrion08} Chanrion M, Negre V, Fontaine H, Salvetat N, Bibeau F, et al. (2008).
+\emph{A gene expression signature that can predict the recurrence of tamoxifen-treated primary breast cancer}.
+Clin Cancer Res, 14: 1744-1752.
+\bibitem{guedj11} Guedj M, Marisa L, de Reynies A, Orsetti B, Schiappa R, et al. (2011).
+\emph{A refined molecular taxonomy of breast cancer}.
+Oncogene, submitted.
+\end{thebibliography}
+}
+
+\end{document}
