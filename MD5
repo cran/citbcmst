@@ -1,0 +1,17 @@
+3f90b9cee0b548255a5065765c33f0bf *DESCRIPTION
+dcdd79169c16f1a41c8c14ee97597578 *R/cit.bcmst.R
+f301df1c4a45a265b58760df81fb79dd *R/cit.centroidsFunc.R
+fa07d015e1a7c76371a3b86bcc3f0a46 *data/citbcmst.RData
+7365f52db1aebd5df961def28bbd854f *data/exp.norm.bertheau07.RData
+55022392af288f6870e310c8965e7ac4 *data/exp.norm.chanrion08.RData
+526f88ed64284ded223187e3ede9ee27 *inst/doc/Rplots.pdf
+b63885bc5af3c3ccd81f762756f3282a *inst/doc/citbcmstdemo.pdf
+2d47c8495b58a01b6d22e3e361617c64 *inst/doc/citbcmstdemo.rnw
+456a9a9800b44fca809ec7906bee8c40 *man/bertheau07.Rd
+961cb1400e71a05dd305e18e8e158385 *man/chanrion08.Rd
+0220a7b69f9cc697f9dbb9a2704df443 *man/cit.assignBcmst.Rd
+debce11a9a8a1457b8dbb087555f0455 *man/cit.centroids.Rd
+ba9d90c7dffade4e73c3a14da6c008a7 *man/cit.dfAggregate.Rd
+c356796c6c1518a3caf1b6643512e158 *man/cit.dist.Rd
+85727efce2db8eec3bc535abb03b949c *man/cit.distToCentroids.Rd
+67313d5d13d0681072584541b232f076 *man/citbcmst.Rd

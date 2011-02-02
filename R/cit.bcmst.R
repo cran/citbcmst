@@ -184,7 +184,10 @@ cit.assignBcmst <- function(  data,
   
       grpb <- grp[-which(is.na(grp))]
       citpca <- prcomp(t(citbcmst.red[,names(grpb)]), center=TRUE, scale.=FALSE)
-      datapca <- prcomp(t(data.red), center=TRUE, scale.=FALSE)
+      
+      # check for na's
+      data.red.wona <- data.red[apply(is.na(data.red),1,sum)==0,]
+      datapca <- prcomp(t(data.red.wona), center=TRUE, scale.=FALSE)
   
       newgrp <- grpcit$citbcmst
   

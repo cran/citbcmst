@@ -53,13 +53,13 @@ summary(citbcmst)
 
 \textit{citbcmst} contains the following objects :
 \begin{description}
-\item[data] CIT coreset expression data matrix
-\item[data.cl] CIT breast cancer molecular subtypes of the coreset
-\item[data.annot] probesets annotations provided by NetAffx (version na30) in order to map samples from other plateforms than Affymetrix
+\item[data] CIT coreset RMA (uncentered) normalized expression data matrix
+\item[data.cl] CIT coreset breast cancer molecular subtypes
+\item[data.annot] CIT coreset probesets annotations provided by NetAffx (version na30) in order to map samples from other plateforms than Affymetrix
 \end{description}
 
 
-To assign a new sample to a CIT subtype ( \textbf{\textit{cit.assignBcmst}} function) the following steps are needed:
+To assign a new sample to a CIT subtype ( \textbf{\textit{cit.assignBcmst}} function) the following steps are performed:
 \begin{enumerate}
 \item{mapping the probes from the new expression dataset to the 375 discrimating probe sets used in the CIT centroids (or to the 257 corresponding HUGO gene symbols, when the microarray platform of the new dataset is not Affymetrix HG U133 plus 2.0) }
 \item{averaging expression measures per HUGO gene symbol both in the new dataset and in the CIT coreset, if step 1 is based on HUGO gene symbols. In any case, the external data and the CIT coreset data are reduced to discrimating probes/genes measured in both datasets. }
@@ -71,16 +71,21 @@ In the first case, the sample will be considered as a \textit{"mixed"} sample an
 In both cases, those samples may be classified as uncertain and so removed from the analysis.\\}
 \end{enumerate}
 
-Only an expression data matrix/data.frame, with ids as rownames, is required (cf section\ref{example}).\\
-
 The output of \textbf{\textit{cit.assignBcmst}} is a dataframe with n rows (n= number of samples in the new dataset) and 4 columns :
 \begin{description}
 \item[citbcmst] subtype of the closest centroid for each sample
-\item[citbcmst.mixed] subtypes of the closest centroids for each sample (for "mixed" samples)
-\item[citbcmst.core] subtype of the closes sample for "core" samples ("outlier" and  "mixed" samples are set to NA)
+\item[citbcmst.mixed] subtypes of the closest centroids for each sample (for "mixed" samples every subtypes are given)
+\item[citbcmst.core] subtype of the closest sample for "core" samples (not "outlier" and not mixed", "outlier" and  "mixed" samples are set to NA)
 \item[citbcmst.confidence] confidence annotation CORE, OUTLIER or MIXED 
 \end{description}
 The cutoffs to define mixed and outlier samples are automatically computed but can be set manually (cf help(cit.bcmst)).
+\\
+\\
+Only an expression data matrix/data.frame, with ids as rownames, is required (cf section\ref{example}).\\
+Affymetrix external expression data should be normalized as CIT coreset data, i.e. by RMA method (justRma function in \textit{affy} R package with default parameters), without centering data. 
+Even if other platforms are managed, the approach has been defined for Affymetrix HG U133Plus2 chip expression data, consequently the assignation given for other platforms is expected to be less reliable.
+\\
+
 
 
 
@@ -89,6 +94,7 @@ The cutoffs to define mixed and outlier samples are automatically computed but c
 \section{Example on an Affymetrix dataset}
 Here is an example on the public dataset from \textit{Bertheau et al 2007}\cite{bertheau07}, using Affymetrix HG U133A platform.
 In this case, mapping to the coreset data can be done on probe sets ids as HG U133A probe sets are included in the HG U133Plus2 chip.
+Raw data were first normalized by RMA method (justRma function in \textit{affy} R package with default parameters). 
 
 \label{example}
 <<affy>>=
