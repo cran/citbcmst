@@ -203,7 +203,7 @@ cit.distToCentroids <- function(d,
       for( g in names(tdist) ){
         L <- split(coresettab[,g], coresettab[,"groups"]==g)["TRUE"]
         inf <- lapply(L, function(x) c(median(x),max(x),mad(x)) )
-        refcoreset <- cbind( refcoreset, matrix(unlist(inf),nc=1, dimnames=list(c("med","max","mad"),g)))
+        refcoreset <- cbind( refcoreset, matrix(unlist(inf), ncol=1, dimnames=list(c("med","max","mad"),g)))
       }
 
       if(is.null(sdisttocent)){
@@ -318,7 +318,7 @@ cit.dfAggregate <- function( data, partition, MARGIN=1, fAggreg=function(x){mean
     d <- matrix(sapply(l,function(i)
                                 if(length(i)==1){unlist(d[i,])}
                                 else{ apply(d[i,],2,fAggreg)}
-                ),ncol= p,byrow=TRUE)
+                ), ncol=p, byrow=TRUE)
 
     d <- as.data.frame(d)
     rownames(d) <- names(l)
