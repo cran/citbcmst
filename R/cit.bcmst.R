@@ -17,7 +17,7 @@
 # value >> a data.frame with 4 columns : "citbcmst" classification to the closest of the 6 subtypes, "citbcmst.mixed" classification to the n closest subtypes depending on dist.difftopcentcutoff, "citbcmst.core" classification without outlier and mixed samples and citbcmst.confidence a confidence assignation annotation (CORE, MIXED or OUTLIER)
 # author >> Laetitia Marisa
 # keyword >> methods
-# examples >> data(exp.norm.bertheau07)
+# examples >> load(list.files(system.file("extdata", package="citbcmst"), full.names=TRUE)[1])# load exp.norm.bertheau07 object stored in /inst/extdata
 # examples >> exp.annot.bertheau07 <- data.frame(id=rownames(exp.norm.bertheau07), stringsAsFactors=FALSE, row.names=rownames(exp.norm.bertheau07) )
 # examples >> citbcmst.bertheau07 <- cit.assignBcmst(   data=exp.norm.bertheau07,
 # examples >>                                           data.annot=exp.annot.bertheau07,
@@ -57,6 +57,14 @@ cit.assignBcmst <- function(  data,
   # check that rownames == data.colId
   if( ! all(rownames(data)%in% rownames(data.annot)) )
     stop("data should have the same rownames as data.annot.")
+
+  if(!is.data.frame(data)){
+    if( is.matrix(data)){
+      data <- as.data.frame(data)
+    }else{
+      stop("data should be either a matrix or a dataframe.")
+    }
+  }
 
 
     ##

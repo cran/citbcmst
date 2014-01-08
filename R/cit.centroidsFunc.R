@@ -38,7 +38,7 @@ cit.centroids <- function(  d,
           }
     }
 
-    if(!is.na(rowCentering))  d <- sweep(d,1,apply(d,1,rowCentering))
+    if(is.function(rowCentering))  d <- sweep(d,1,apply(d,1,rowCentering))
 
     w <- which(!is.na(classes))
 
@@ -109,7 +109,7 @@ cit.distToCentroids <- function(d,
                 }
           }
 
-          if(!is.na(centroids$rowCentering))  d <- sweep(d,1,apply(d,1,centroids$rowCentering))
+          if(is.function(centroids$rowCentering))  d <- sweep(d,1,apply(d,1,centroids$rowCentering))
     }
 
     ## add centroid data to compute distance on centroids data

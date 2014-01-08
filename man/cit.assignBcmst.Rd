@@ -2,7 +2,17 @@
 \alias{cit.assignBcmst}
 \title{cit.assignBcmst}
 \description{assign expression data sample(s) to CIT Breast Cancer Molecular Subtypes}
-\usage{cit.assignBcmst(  data,data.annot,data.colId="Probe.Set.ID",data.colMap=c("Probe.Set.ID","Gene.Symbol","Ensembl","UniGene.ID")[1],citbcmst.annot=NULL,citbcmst.colId="Probe.Set.ID",citbcmst.colMap=c("Probe.Set.ID","Gene.Symbol","Ensembl","UniGene.ID")[1],dist.method="dlda",dist.difftopcentcutoff=NULL,dist.disttocentcutoff=NULL,dist.maxcutoff=NULL,plot=FALSE)}
+\usage{cit.assignBcmst(  data,
+data.annot,
+data.colId="Probe.Set.ID",
+data.colMap=c("Probe.Set.ID","Gene.Symbol","Ensembl","UniGene.ID")[1],
+citbcmst.annot=NULL,citbcmst.colId="Probe.Set.ID",
+citbcmst.colMap=c("Probe.Set.ID","Gene.Symbol","Ensembl","UniGene.ID")[1],
+dist.method="dlda",
+dist.difftopcentcutoff=NULL,
+dist.disttocentcutoff=NULL,
+dist.maxcutoff=NULL,
+plot=FALSE)}
 \arguments{
 \item{data}{a data.frame of expression data with id as rownames}
 \item{data.annot}{a data.frame of data probes annotations}
@@ -21,8 +31,10 @@
 }
 \author{Laetitia Marisa}
 \keyword{methods}
-\examples{data(exp.norm.bertheau07)
-exp.annot.bertheau07 <- data.frame(id=rownames(exp.norm.bertheau07), stringsAsFactors=FALSE, row.names=rownames(exp.norm.bertheau07) )
+\examples{load(list.files(system.file("extdata", package="citbcmst"), full.names=TRUE)[1])
+# load exp.norm.bertheau07 object stored in /inst/extdata
+exp.annot.bertheau07 <- data.frame(id=rownames(exp.norm.bertheau07), stringsAsFactors=FALSE,
+row.names=rownames(exp.norm.bertheau07) )
 citbcmst.bertheau07 <- cit.assignBcmst(    data=exp.norm.bertheau07,
                                            data.annot=exp.annot.bertheau07,
                                            data.colId="id",
